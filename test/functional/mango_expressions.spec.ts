@@ -1,12 +1,13 @@
 import {expect} from 'chai';
 import {suite, test} from 'mocha-typescript';
-import {inspect} from 'util';
+// import {inspect} from 'util';
 import {AbstractCompare, IMangoWalker, MangoExpression, PAst, PObject, PValue} from '../../src';
 import {Project} from '../../src/operators/stage/Project';
 import {And} from '../../src/operators/logic/And';
 import {Or} from '../../src/operators/logic/Or';
 import {Not} from '../../src/operators/logic/Not';
 import {Match} from '../../src/operators/stage/Match';
+
 
 const visitor = new class implements IMangoWalker {
   onValue(ast: PValue): any {

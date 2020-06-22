@@ -1,6 +1,7 @@
 import {expect} from 'chai';
 import {suite, test} from 'mocha-typescript';
 // import {inspect} from 'util';
+import * as _ from 'lodash';
 import {AbstractCompare, IMangoWalker, MangoExpression, PAst, PObject, PValue} from '../../src';
 import {Project} from '../../src/operators/stage/Project';
 import {And} from '../../src/operators/logic/And';
@@ -65,6 +66,11 @@ const visitor = new class implements IMangoWalker {
 
   leaveObject(res: any, ast: PAst): any {
     // console.log('leaveObject ' + ClassUtils.getClassName(ast as any) + ' ' + ast.key);
+    if (_.keys(res).length > 1) {
+      return {
+        and: res
+      };
+    }
     return res;
   }
 };
@@ -96,6 +102,25 @@ class InjectSpec {
     // console.log(result);
     expect(exp.getRoot()).to.be.instanceOf(PObject);
     expect(result).to.be.deep.eq({id: 'id = 1'});
+  }
+
+
+  @test
+  async 'multiple value query'() {
+    const exp = new MangoExpression({id: 1, role: 'Good', owner: 'Hans'});
+    // const matchExp = exp.getKey('$match');
+    // console.log(inspect(exp, false, 10));
+
+    const result = exp.getRoot().visit(visitor);
+    // console.log(result);
+    expect(exp.getRoot()).to.be.instanceOf(PObject);
+    expect(result).to.be.deep.eq({
+      'and': {
+        'id': 'id = 1',
+        'owner': 'owner = Hans',
+        'role': 'role = Good'
+      }
+    });
   }
 
 

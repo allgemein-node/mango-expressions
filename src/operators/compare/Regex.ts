@@ -18,8 +18,9 @@ export class Regex extends AbstractCompare {
 
   validate(def: any, full?: any): boolean {
     if (_.isString(def)) {
+      this.op = 'regexp';
       this.regexp = def;
-      if (_.has('$options', full)) {
+      if (_.has(full, '$options')) {
         this.options = full['$options'];
       }
       return true;
@@ -34,7 +35,10 @@ export class Regex extends AbstractCompare {
 
   visit(o: IMangoWalker): any {
     if (this.regexp) {
-      return o.onOperator(this, new MultiArgs(this.regexp, this.options));
+      if (this.options) {
+        return o.onOperator(this, new MultiArgs(this.regexp, this.options));
+      }
+      return o.onOperator(this,  new MultiArgs(this.regexp));
     }
     return o.onOperator(this, null);
   }

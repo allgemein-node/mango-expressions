@@ -52,12 +52,12 @@ export class MangoExpression {
       result = new PArray(this, def, p, context);
     } else if (_.isObjectLike(def)) {
       const k = _.keys(def);
-      // TODO make multiple $operators work
-      if (k.length === 1 && /^\$/.test(k[0])) {
-        const operatorKey = k[0];
+      // TODO make multiple $registry work
+      const operators = k.filter(x => /^\$/.test(x) && Operators.has(x.substr(1)));
+      if (operators.length === 1) {
+        const operatorKey = operators[0];
         const follow = def[operatorKey];
-        const operatorKey1 = operatorKey.replace(/^\$/, '');
-        const operator = Operators.create(operatorKey1, this, p, context);
+        const operator = Operators.create(operatorKey, this, p, context);
         if (!operator.validate(follow, def)) {
           throw new Error(`operator ${operatorKey} has no valid definition ${JSON.stringify(def)}`);
         }

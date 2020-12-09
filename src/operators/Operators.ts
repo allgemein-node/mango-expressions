@@ -1,12 +1,4 @@
-import {Substr} from './string/Substr';
 import {PAst} from '../ast/PAst';
-import {ToUpper} from './string/ToUpper';
-import {ToLower} from './string/ToLower';
-import {ToInt} from './string/ToInt';
-import {ToFloat} from './string/ToFloat';
-import {Map} from './array/Map';
-import {First} from './array/First';
-import {Last} from './array/Last';
 import {Match} from './stage/Match';
 import {LessThen} from './compare/LessThen';
 import {MangoExpression} from '../MangoExpression';
@@ -41,24 +33,59 @@ import {Not} from './logic/Not';
 import {Multiply} from './arithmetic/Multiply';
 import {Regex} from './compare/Regex';
 
+/**
+ * Operators registry
+ */
 export class Operators {
-  static operators: { [k: string]: Function } = {};
 
-  static install(name: string, opertor: Function) {
-    Operators.operators[name] = opertor;
+
+  static registry: { [k: string]: Function } = {};
+
+
+  static key(k: string) {
+    return k.replace(/^\$/, '');
   }
 
+  /**
+   * Install new operator
+   *
+   * @param name
+   * @param opertor
+   */
+  static install(name: string, opertor: Function) {
+    const _name = this.key(name);
+    Operators.registry[_name] = opertor;
+  }
+
+  /**
+   * Create an operator instance
+   *
+   * @param name
+   * @param e
+   * @param p
+   * @param ctxt
+   */
   static create(name: string, e: MangoExpression, p?: PAst, ctxt?: Context) {
-    if (this.operators[name]) {
-      return Reflect.construct(this.operators[name], [e, p, ctxt]);
+    const _name = this.key(name);
+    if (this.registry[_name]) {
+      return Reflect.construct(this.registry[_name], [e, p, ctxt]);
     } else {
-      throw new Error(`no such operator ${name} defined`);
+      throw new Error(`no such operator ${_name} defined`);
     }
+  }
+
+  /**
+   * Check if operator is defined.
+   *
+   * @param name
+   */
+  static has(name: string) {
+    return this.registry.hasOwnProperty(this.key(name));
   }
 }
 
 /*
- *  Logic operators
+ *  Logic registry
  */
 Operators.install(And.NAME, And);
 Operators.install(Or.NAME, Or);
@@ -67,7 +94,7 @@ Operators.install(Not.NAME, Not);
 
 
 /*
- *  Stage operators
+ *  Stage registry
  */
 Operators.install(Match.NAME, Match);
 Operators.install(Project.NAME, Project);
@@ -77,7 +104,7 @@ Operators.install(Skip.NAME, Skip);
 Operators.install(Sort.NAME, Sort);
 
 /*
- *  Date operators
+ *  Date registry
  */
 Operators.install(Year.NAME, Year);
 Operators.install(Month.NAME, Month);
@@ -86,7 +113,7 @@ Operators.install(Date.NAME, Date);
 // TODO $dateToString
 
 /*
- *  Arithmetic operators
+ *  Arithmetic registry
  */
 Operators.install(Sum.NAME, Sum);
 Operators.install(Min.NAME, Min);
@@ -98,7 +125,7 @@ Operators.install(Multiply.NAME, Multiply);
 // TODO $subtract
 
 /*
- *  Compare operators
+ *  Compare registry
  */
 Operators.install(LessThen.NAME, LessThen);
 Operators.install(LessThenEqual.NAME, LessThenEqual);
@@ -119,9 +146,8 @@ Operators.install(NotIn.NAME, NotIn);
 Operators.install(Regex.NAME, Regex);
 
 
-
 /*
- *  String operators
+ *  String registry
  */
 // Operators.install(Substr.NAME, Substr);
 // Operators.install(ToUpper.NAME, ToUpper);
@@ -130,7 +156,7 @@ Operators.install(Regex.NAME, Regex);
 // Operators.install(ToFloat.NAME, ToFloat);
 
 /*
- *  Array operators
+ *  Array registry
  */
 // Operators.install(Map.NAME, Map);
 // Operators.install(First.NAME, First);

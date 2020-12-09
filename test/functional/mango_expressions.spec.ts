@@ -1,13 +1,13 @@
 import {expect} from 'chai';
 import {suite, test} from 'mocha-typescript';
-// import {inspect} from 'util';
 import * as _ from 'lodash';
-import {AbstractCompare, IMangoWalker, MangoExpression, PAst, PObject, PValue} from '../../src';
+import {AbstractCompare, IMangoWalker, MangoExpression, MultiArgs, PAst, PObject, PValue} from '../../src';
 import {Project} from '../../src/operators/stage/Project';
 import {And} from '../../src/operators/logic/And';
 import {Or} from '../../src/operators/logic/Or';
 import {Not} from '../../src/operators/logic/Not';
 import {Match} from '../../src/operators/stage/Match';
+import {NotYetImplementedError} from 'commons-base';
 
 
 const visitor = new class implements IMangoWalker {
@@ -26,7 +26,18 @@ const visitor = new class implements IMangoWalker {
   onOperator(ast: PAst, value: any): any {
     // console.log('onOperator ' + ClassUtils.getClassName(ast as any) + ' ' + ast.key);
     if (ast instanceof AbstractCompare) {
-      return ast.key + ' ' + ast.op + ' ' + (<PValue>ast.value).value;
+      if (value instanceof PValue) {
+        return ast.key + ' ' + ast.op + ' ' + (<PValue>value).value;
+      } else if (ast.value instanceof PValue) {
+        return ast.key + ' ' + ast.op + ' ' + (<PValue>ast.value).value;
+      } else if (value instanceof MultiArgs) {
+        return ast.key + ' ' + ast.op + ' ' + JSON.stringify((<MultiArgs>value).args);
+      } else if (_.isString(value)) {
+        return ast.key + ' ' + ast.op + ' ' + value;
+      } else {
+        throw new NotYetImplementedError('on operator ' + JSON.stringify(ast) + ' ' + value);
+      }
+
     }
     return null;
   }
@@ -183,6 +194,23 @@ class InjectSpec {
     expect(result).to.be.deep.eq({test: 'test_projected'});
   }
 
+
+  @test
+  async '$regex'() {
+    const exp = new MangoExpression({stg: {$regex: '.*849.*'}});
+    const result = exp.visit(visitor);
+    expect(exp.getRoot()).to.be.instanceOf(PObject);
+    expect(result).to.be.deep.eq({ stg: 'stg regexp [".*849.*"]' });
+  }
+
+  @test
+  async '$regex with $options'() {
+    const exp = new MangoExpression({stg: {$regex: '.*849.*', $options: 'i'}});
+    expect(exp.getRoot()).to.be.instanceOf(PObject);
+    const result = exp.visit(visitor);
+    expect(result).to.be.deep.eq({ stg: 'stg regexp [".*849.*","i"]' });
+  }
+
   @test
   async 'use chained operators'() {
     const exp = new MangoExpression({field: {$not: {$eq: 1}}});
@@ -200,6 +228,18 @@ class InjectSpec {
     expect(result).to.be.deep.eq({field: 'not field = 1'});
   }
 
+  @test
+  async 'date'() {
+    const date = new Date();
+    const exp = new MangoExpression({date: {$eq: date}});
+    const matchExp = exp.getRoot();
+    // console.log(inspect(matchExp, false, 10));
+
+    const result = matchExp.visit(visitor);
+    // console.log(inspect(result, false, 10));
+    // expect(matchExp).to.be.instanceOf(Equal);
+    expect(result).to.be.deep.eq({date: 'date = ' + date.toString()});
+  }
 
 }
 

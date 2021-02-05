@@ -1,0 +1,27 @@
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: circleci/node:14
+#    machine:
+#      image: ubuntu-2004:202010-01
+    working_directory: ~/app
+    environment:
+      TZ: Europe/Berlin
+    steps:
+
+      - checkout
+
+      - run:
+          name: Install npm wee
+          command: npm install
+
+      - run:
+          name: Test
+          command: npm test
+
+# Orchestrate our job run sequence
+workflows:
+  test:
+    jobs:
+      - test

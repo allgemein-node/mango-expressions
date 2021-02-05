@@ -1,7 +1,7 @@
 import {PAst} from './PAst';
 import {MangoExpression} from '../MangoExpression';
 import {IMangoWalker} from '../IMangoWalker';
-import {NotYetImplementedError} from 'commons-base/browser';
+import {NotYetImplementedError} from '@allgemein/base/browser';
 import {Context} from './Context';
 
 export abstract class PValue extends PAst {

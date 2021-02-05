@@ -7,7 +7,7 @@ import {And} from '../../src/operators/logic/And';
 import {Or} from '../../src/operators/logic/Or';
 import {Not} from '../../src/operators/logic/Not';
 import {Match} from '../../src/operators/stage/Match';
-import {NotYetImplementedError} from 'commons-base';
+import {NotYetImplementedError} from '@allgemein/base/browser';
 
 
 const visitor = new class implements IMangoWalker {
@@ -200,7 +200,7 @@ class InjectSpec {
     const exp = new MangoExpression({stg: {$regex: '.*849.*'}});
     const result = exp.visit(visitor);
     expect(exp.getRoot()).to.be.instanceOf(PObject);
-    expect(result).to.be.deep.eq({ stg: 'stg regexp [".*849.*"]' });
+    expect(result).to.be.deep.eq({stg: 'stg regexp [".*849.*"]'});
   }
 
   @test
@@ -208,7 +208,7 @@ class InjectSpec {
     const exp = new MangoExpression({stg: {$regex: '.*849.*', $options: 'i'}});
     expect(exp.getRoot()).to.be.instanceOf(PObject);
     const result = exp.visit(visitor);
-    expect(result).to.be.deep.eq({ stg: 'stg regexp [".*849.*","i"]' });
+    expect(result).to.be.deep.eq({stg: 'stg regexp [".*849.*","i"]'});
   }
 
   @test

@@ -1,6 +1,10 @@
 // import {suite, test} from '@testdeck/mocha';
 //
 // import {expect} from 'chai';
+// import {And} from "../../src/operators/logic/AndDesc";
+// import {Eq} from "../../src/operators/compare/EqualDesc";
+// import {Value} from "../../src/ast/Value";
+// import {Key} from "../../src/ast/KeyDesc";
 // // import {AndDesc, Eq, Key, OrDesc, Value} from "../../src";
 // // import {Expressions} from "../../src/libs/expressions/Expressions";
 //

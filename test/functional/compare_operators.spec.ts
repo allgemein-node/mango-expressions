@@ -98,7 +98,7 @@ class CompareOperatorsSpec {
     expect(json).to.be.deep.eq({id: {$eq: 1}});
   }
 
-  @test.only
+  @test
   async 'eq operator - date'() {
     const d = new Date('2012-09-01T10:10:20.000Z');
     const exp = new MangoExpression({since: d});

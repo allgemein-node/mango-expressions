@@ -8,7 +8,7 @@ export {Unset} from './ast/Unset';
 export {Value} from './ast/Value';
 export {ValueRef} from './ast/ValueRef';
 export {AUTO_EQUAL_CONV_SUPPORT, NUMBER_PROJECT_SUPPORT} from './Constants';
-export {IMangoWalker} from './IMangoWalker';
+export {IMangoWalker, IMangoWalkerControl} from './IMangoWalker';
 export {MangoExpression} from './MangoExpression';
 export {AbstractOperator} from './operators/AbstractOperator';
 export {Avg} from './operators/arithmetic/Avg';

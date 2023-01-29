@@ -49,5 +49,5 @@ export {
   Substr,
   Sum,
   ToFloat,
-  ToInt, ToLower, ToUpper, Unset, Value, ValueRef, Year
+  ToInt, ToLower, ToUpper, Unset, Value, ValueRef, Year, IMangoWalkerControl
 } from './browser';

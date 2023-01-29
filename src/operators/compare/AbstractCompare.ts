@@ -1,13 +1,14 @@
 import {AbstractOperator} from '../AbstractOperator';
 import {Context} from '../../ast/Context';
 
-export abstract class AbstractCompare extends AbstractOperator {
+export abstract class AbstractCompare<X> extends AbstractOperator<X> {
 
   op: string;
 
 
-  validate(def: any): boolean {
-    this.value = this.base.interprete(def, this, new Context(this.key));
+  validate(rightSide: any): boolean {
+    const value = this.getRootExpression().interprete(rightSide, this, new Context(this.getKeyString()));
+    this.setValue(value as any);
     return true;
   }
 

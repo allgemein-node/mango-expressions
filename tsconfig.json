@@ -2,14 +2,13 @@
   "compilerOptions": {
     "lib": [
       "es5",
-      "es6",
-      "dom"
+      "es6"
     ],
+    "rootDir": ".",
     "outDir": "./build/compiled",
     "target": "es6",
     "module": "CommonJS",
     "moduleResolution": "node",
-    "rootDir": ".",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -19,6 +18,8 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "stripInternal": true,
+    "skipLibCheck": true,
+    //"strictNullChecks": true,
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "typeRoots": [
@@ -26,9 +27,9 @@
     ]
   },
   "exclude": [
+    "node_modules",
     "build",
     "dist",
-    "node_modules",
     "tmp"
   ],
   "compileOnSave": true

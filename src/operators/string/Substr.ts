@@ -3,13 +3,11 @@ import {AbstractOperator} from '../AbstractOperator';
 import {PAst} from '../../ast/PAst';
 import {Context} from '../../ast/Context';
 
-export class Substr extends AbstractOperator {
+export class Substr extends AbstractOperator<PAst<any>> {
 
   static NAME = 'substr';
 
   name = Substr.NAME;
-
-  value: PAst;
 
   args: any[] = [];
 
@@ -19,7 +17,7 @@ export class Substr extends AbstractOperator {
 
       const v = def.shift();
       if (_.isString(v)) {
-        this.value = this.base.interprete(v, this, new Context(this.key));
+        this.value = this.getRootExpression().interprete(v, this, new Context(this.getKeyString()));
       }
 
       if (!this.value) {

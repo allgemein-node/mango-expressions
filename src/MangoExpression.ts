@@ -8,10 +8,11 @@ import {Operators} from './operators/Operators';
 import {IMangoWalker} from './IMangoWalker';
 import {Context} from './ast/Context';
 import {AUTO_EQUAL_CONV_SUPPORT} from './Constants';
+import {ClassType} from '@allgemein/schema-api';
 
 export class MangoExpression {
 
-  readonly root: PAst = null;
+  readonly root: PAst<any> = null;
 
   constructor(def: any) {
     // default change object assignment to value
@@ -20,8 +21,8 @@ export class MangoExpression {
     this.root = this.interprete(def, null, ctxt);
   }
 
-  getKey(key: string) {
-    return this.root.getKey(key);
+  getByKey(key: string) {
+    return this.root.getByKey(key);
   }
 
   getRoot() {
@@ -29,14 +30,13 @@ export class MangoExpression {
   }
 
 
-  interprete(def: any, p?: PAst, ctxt?: Context) {
+  interprete(def: any, p?: PAst<any>, ctxt?: Context) {
     const context = ctxt ? ctxt : new Context();
     if (p) {
       context.key = ctxt.key;
-      context.merge(p.context);
+      context.merge(p.getContext());
     }
-    // context.key = sourceKey ? sourceKey : undefined;
-    let result: PAst = null;
+    let result: PAst<any> = null;
     if (_.isString(def) ||
       _.isNumber(def) ||
       _.isDate(def) ||
@@ -44,12 +44,12 @@ export class MangoExpression {
       _.isBoolean(def)) {
       const isRef = _.isString(def) && def.match(/^\$(.+)/);
       if (isRef) {
-        result = new ValueRef(this, isRef[1], p, context);
+        result = this.create(ValueRef, isRef[1], p, context);
       } else {
-        result = new Value(this, def, p, context);
+        result = this.create(Value, def, p, context);
       }
     } else if (_.isArray(def)) {
-      result = new PArray(this, def, p, context);
+      result = this.create(PArray, def, p, context);
     } else if (_.isObjectLike(def)) {
       const k = _.keys(def);
       // TODO make multiple $registry work
@@ -57,13 +57,9 @@ export class MangoExpression {
       if (operators.length === 1) {
         const operatorKey = operators[0];
         const follow = def[operatorKey];
-        const operator = Operators.create(operatorKey, this, p, context);
-        if (!operator.validate(follow, def)) {
-          throw new Error(`operator ${operatorKey} has no valid definition ${JSON.stringify(def)}`);
-        }
-        result = operator;
+        result = this.getOperator(operatorKey, follow, def, p, context);
       } else {
-        result = new PObject(this, def, p, context);
+        result = this.create(PObject, def, p, context);
       }
     }
 
@@ -76,8 +72,31 @@ export class MangoExpression {
   }
 
 
+  getOperator(operatorKey: string, operatorValue: any, def: any, parent: PAst<any>, context: Context) {
+    const operator = Operators.create(operatorKey, this, parent, context);
+    operator.interprete(this, operatorValue, parent, context);
+    // if (!operator.validate(operatorValue, def)) {
+    //   throw new Error(`operator ${operatorKey} has no valid definition ${JSON.stringify(def)}`);
+    // }
+    return operator;
+  }
+
+
+  create<X extends PAst<any>>(root: ClassType<X>, def: any, p?: PAst<any>, ctxt?: Context) {
+    const x = Reflect.construct(root, []) as X;
+    x.interprete(this, def, p, ctxt);
+    return x;
+  }
+
+
   visit(o: IMangoWalker) {
     return this.root.visit(o);
+  }
+
+
+
+  toJson() {
+    return this.root.toJson();
   }
 
 }

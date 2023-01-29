@@ -5,15 +5,16 @@ import {PAst} from '../../ast/PAst';
 import {Context} from '../../ast/Context';
 import {AUTO_EQUAL_CONV_SUPPORT} from '../../Constants';
 
-export class Match extends AbstractOperator {
+export class Match extends AbstractOperator<PAst<any>> {
 
   static NAME = 'match';
 
   name = Match.NAME;
 
-  constructor(e: MangoExpression, p?: PAst, ctxt?: Context) {
-    super(e, p, ctxt);
-    this.context.set(AUTO_EQUAL_CONV_SUPPORT, true);
+
+  interprete(e: MangoExpression, value: PAst<any>, p: PAst<any>, ctxt?: Context) {
+    this.getContext().set(AUTO_EQUAL_CONV_SUPPORT, true);
+    super.interprete(e, value, p, ctxt);
   }
 
 

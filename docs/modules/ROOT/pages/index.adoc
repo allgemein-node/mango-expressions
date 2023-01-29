@@ -1,0 +1,52 @@
+# @allgemein/mango-expressions
+
+
+## Usage
+
+* Parse existing JSON expression
+* Parse logical expression
+```
+tableName = 'dummy' AND tableId = $id
+```
+* Create expression by code
+```javascript
+let cond = And(Eq('tableName', Value('dummy')), Eq('tableId', Key('id')));
+console.log(cond.toJson())
+// {
+//     $and: [
+//         {tableName: 'dummy'},
+//         {tableId: '$id'}
+//     ]
+// }
+```
+* Generate validation function
+* Generate lookup function
+```javascript
+const exp = new MangoExpression({id: 1})
+const generator = exp.visit(new LookupWalker());
+
+const target = {id: 1, name: 'test'};
+const errorTarget = {id: 2, name: 'test'};
+
+const checkFn = generator.generateCheckFunction();
+checkFn(target) // true
+checkFn(errorTarget) // false
+
+const findFn = generator.generateFindFunction();
+findFn([target,errorTarget]) // {id:1, name:'test'}
+
+const filterFn = generator.generateFilterFunction();
+filterFn([target,errorTarget]) // [{id:1, name:'test'}]
+
+// TODO variant with
+
+```
+
+* Generate convert function
+* Generate projection function
+
+
+
+## Notes
+
+* Extend AST by custom interpreter function

@@ -1,13 +1,12 @@
-import {AbstractOperator} from '../AbstractOperator';
 import {PAst} from '../../ast/PAst';
 import {IMangoWalker, IMangoWalkerControl} from '../../IMangoWalker';
+import {AbstractLogic} from './AbstractLogic';
 
-export class Not extends AbstractOperator {
+export class Not extends AbstractLogic<PAst<any>> {
 
   static NAME = 'not';
 
   name = Not.NAME;
-
 
 
   visit(o: IMangoWalker): any {

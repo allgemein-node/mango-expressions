@@ -8,19 +8,24 @@ import * as _ from 'lodash';
 
 export const GROUP_ID = 'GROUP_ID';
 
-export class Group extends AbstractOperator {
+export class Group extends AbstractOperator<PAst<any>> {
 
   static NAME = 'group';
 
   name = Group.NAME;
 
-  _id: PAst;
+  _id: PAst<any>;
 
-  constructor(e: MangoExpression, p?: PAst, ctxt?: Context) {
-    super(e, p, ctxt);
-    this.context.set(AUTO_EQUAL_CONV_SUPPORT, false);
+  // constructor(e: MangoExpression, p?: PAst, ctxt?: Context) {
+  //   super(e, p, ctxt);
+  //   this.getContext().set(AUTO_EQUAL_CONV_SUPPORT, false);
+  // }
+
+
+  interprete(e: MangoExpression, value: PAst<any>, p: PAst<any>, ctxt?: Context) {
+    this.getContext().set(AUTO_EQUAL_CONV_SUPPORT, false);
+    super.interprete(e, value, p, ctxt);
   }
-
 
   visit(o: IMangoWalker): any {
     const state: IMangoWalkerControl = {};
@@ -29,7 +34,7 @@ export class Group extends AbstractOperator {
       return r;
     }
     const _id = this._id.visit(o);
-    const relts = this.value.visit(o);
+    const relts = this.getValue().visit(o);
     relts['_id'] = _id;
     return o.leaveOperator(relts, this);
   }
@@ -38,11 +43,11 @@ export class Group extends AbstractOperator {
   validate(def: any): boolean {
     let ctxt = new Context('_id');
     ctxt.set(GROUP_ID, true);
-    this._id = this.base.interprete(def['_id'], this, ctxt);
+    this._id = this.getRootExpression().interprete(def['_id'], this, ctxt);
     const defClone = _.cloneDeep(def);
     delete defClone['_id'];
-    ctxt = new Context(this.key);
-    this.value = this.base.interprete(defClone, this, ctxt);
+    ctxt = new Context(this.getKeyString());
+    this.value = this.getRootExpression().interprete(defClone, this, ctxt);
     return true;
   }
 }

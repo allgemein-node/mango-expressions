@@ -19,26 +19,26 @@ import {Context} from '../../ast/Context';
  *             }
  * }
  */
-export class Map extends AbstractOperator {
+export class Map extends AbstractOperator<null> {
 
   static NAME = 'map';
 
   name = Map.NAME;
 
-  input: PAst;
+  input: PAst<any>;
 
   as: string;
 
-  in: PAst;
+  in: PAst<any>;
 
   validate(def: any): boolean {
     if (_.isObjectLike(def) &&
       _.has(def, 'input') &&
       _.has(def, 'as') &&
       _.has(def, 'in')) {
-      this.input = this.base.interprete(def.input, this, new Context(this.key));
+      this.input = this.getRootExpression().interprete(def.input, this, new Context(this.getKeyString()));
       this.as = def.as;
-      this.in = this.base.interprete(def.in, this, new Context(this.key));
+      this.in = this.getRootExpression().interprete(def.in, this, new Context(this.getKeyString()));
       return true;
     }
     return false;

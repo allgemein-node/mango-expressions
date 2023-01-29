@@ -1,6 +1,6 @@
 import {AbstractOperator} from '../AbstractOperator';
 
-export class Multiply extends AbstractOperator {
+export class Multiply extends AbstractOperator<any> {
 
   static NAME = 'multiply';
 

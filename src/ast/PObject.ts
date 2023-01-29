@@ -1,39 +1,42 @@
-import * as _ from 'lodash';
+import {isArray, isBoolean, isDate, isNull, isNumber, isObjectLike, isString, values, keys} from 'lodash';
 import {PAst} from './PAst';
 import {ValueRef} from './ValueRef';
 import {Unset} from './Unset';
-import {MangoExpression} from '../MangoExpression';
 import {IMangoWalker, IMangoWalkerControl} from '../IMangoWalker';
-import {Equal} from '../operators/compare/Equal';
 import {Context} from './Context';
 import {AUTO_EQUAL_CONV_SUPPORT, NUMBER_PROJECT_SUPPORT} from '../Constants';
+import {MangoExpression} from '../MangoExpression';
 
-export class PObject extends PAst {
-
-  children: { [k: string]: PAst } = {};
+export class PObject extends PAst<{ [k: string]: PAst<any> }> {
+  //
+  // children: { [k: string]: PAst } = {};
 
   _keys: string[];
 
 
-  constructor(e: MangoExpression, kv: any, p?: PAst, ctxt?: Context) {
-    super(e, p, ctxt);
-    this.interprete(kv);
-  }
+  // constructor(e: MangoExpression, kv: any, p?: PAst, ctxt?: Context) {
+  //   super(e, p, ctxt);
+  //   this.interprete(kv);
+  // }
 
-  getKey(key: string): PAst {
-    if (this.children[key]) {
-      return this.children[key];
+  // create(){
+  //
+  // }
+
+  getByKey(key: string): PAst<any> {
+    if (this.getValue()[key]) {
+      return this.getValue()[key];
     }
     return null;
     // throw new NotYetImplementedError();
   }
 
   keys() {
-    const prefix = (this.key && _.isString(this.key) ? this.key + '.' : '');
+    const prefix = (this.getKeyString() && isString(this.getKeyString()) ? this.getKeyString() + '.' : '');
     const keys: string[] = [];
     for (const k of this._keys) {
-      const subkey = this.children[k].keys();
-      subkey.forEach(x => {
+      const subkey = this.getValues()[k].keys();
+      subkey.forEach((x: string) => {
         keys.push(prefix + x);
       });
     }
@@ -43,52 +46,78 @@ export class PObject extends PAst {
 
   visit(o: IMangoWalker): any {
     const state: IMangoWalkerControl = {};
-    const r = o.visitObject(this, state);
+    let r: any = {};
+
+    if (o.visitObject) {
+      r = o.visitObject(this, state);
+    }
+
     if (state && state.abort) {
       return r;
     }
 
     for (const k of this._keys) {
-      r[k] = this.children[k].visit(o);
+      r[k] = this.value[k].visit(o);
     }
-    return o.leaveObject(r, this);
+
+    if(o.leaveObject){
+      return o.leaveObject(r, this);
+    }
+    return r;
   }
 
 
   getValues() {
-    return _.values(this.children);
+    return values(this.value);
   }
 
 
-  interprete(kv: any) {
-    this._keys = _.keys(kv);
+  interprete(e: MangoExpression, value: { [k: string]: any }, p?: PAst<any>, ctxt?: Context) {
+    // do not pass and interprete value
+    this.enviroment(e, p, ctxt);
+    this.value = {};
+    this._keys = keys(value);
 
-    const autoEqualSupport = !!this.context.get(AUTO_EQUAL_CONV_SUPPORT);
-    const numberProjectSupport = !!this.context.get(NUMBER_PROJECT_SUPPORT);
+    const autoEqualSupport = !!this.getContext().get(AUTO_EQUAL_CONV_SUPPORT);
+    const numberProjectSupport = !!this.getContext().get(NUMBER_PROJECT_SUPPORT);
 
     for (const k of this._keys) {
       const ctxt = new Context(k);
-      const v = kv[k];
+      const v = value[k];
       if (!autoEqualSupport) {
-        if (numberProjectSupport && _.isNumber(v) && (v === 1 || v === 0)) {
+        if (numberProjectSupport && isNumber(v) && (v === 1 || v === 0)) {
           if (v === 1) {
-            this.children[k] = new ValueRef(this.base, k, this, ctxt);
+            this.value[k] = this.getRootExpression().create(ValueRef, k, this, ctxt);
           } else {
-            this.children[k] = new Unset(this.base, k, this, ctxt);
+            this.value[k] = this.getRootExpression().create(Unset, k, this, ctxt);
           }
         } else {
-          this.children[k] = this.base.interprete(v, this, ctxt);
+          this.value[k] = this.getRootExpression().interprete(v, this, ctxt);
         }
       } else {
-        if (_.isObjectLike(v) || _.isArray(v)) {
-          this.children[k] = this.base.interprete(v, this, ctxt);
+        const isPrimative = isDate(v) || isNumber(v) || isString(v) || isBoolean() || isNull(v);
+        if (!isPrimative && (isObjectLike(v) || isArray(v))) {
+          this.value[k] = this.getRootExpression().interprete(v, this, ctxt);
         } else {
-          const eq = new Equal(this.base, this, ctxt);
-          this.children[k] = eq;
-          eq.validate(v);
+          const eq = this.getRootExpression().getOperator('$eq', v, value, this, ctxt);
+          this.value[k] = eq;
+          // eq.validate(v);
         }
       }
     }
+  }
+
+
+  toJson(): any {
+    let obj = {};
+    for (const k of this._keys) {
+      if (this.value[k] instanceof PAst) {
+        obj[k] = this.value[k].toJson();
+      } else {
+        obj[k] = this.value[k];
+      }
+    }
+    return obj;
   }
 
 

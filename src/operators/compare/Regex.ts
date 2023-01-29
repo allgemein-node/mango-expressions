@@ -4,13 +4,11 @@ import {AbstractCompare} from './AbstractCompare';
 import {IMangoWalker} from '../../IMangoWalker';
 import {MultiArgs} from '../../ast/MultiArgs';
 
-export class Regex extends AbstractCompare {
+export class Regex extends AbstractCompare<PAst<any>> {
 
   static NAME = 'regex';
 
   name = Regex.NAME;
-
-  value: PAst;
 
   regexp: string;
 

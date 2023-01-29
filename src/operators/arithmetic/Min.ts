@@ -1,6 +1,6 @@
 import {AbstractOperator} from '../AbstractOperator';
 
-export class Min extends AbstractOperator {
+export class Min extends AbstractOperator<any> {
 
   static NAME = 'min';
 

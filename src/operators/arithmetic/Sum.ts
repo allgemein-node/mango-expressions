@@ -1,6 +1,6 @@
 import {AbstractOperator} from '../AbstractOperator';
 
-export class Sum extends AbstractOperator {
+export class Sum extends AbstractOperator<any> {
 
   static NAME = 'sum';
 

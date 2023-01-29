@@ -5,17 +5,17 @@ import {MangoExpression} from '../../MangoExpression';
 import {Context} from '../../ast/Context';
 import {AUTO_EQUAL_CONV_SUPPORT, NUMBER_PROJECT_SUPPORT} from '../../Constants';
 
-export class Project extends AbstractOperator {
+export class Project extends AbstractOperator<PAst<any>> {
 
   static NAME = 'project';
 
   name = Project.NAME;
 
 
-  constructor(e: MangoExpression, p?: PAst, ctxt?: Context) {
-    super(e, p, ctxt);
-    this.context.set(AUTO_EQUAL_CONV_SUPPORT, false);
-    this.context.set(NUMBER_PROJECT_SUPPORT, true);
+  interprete(e: MangoExpression, value: any, p?: PAst<any>, ctxt?: Context) {
+    super.interprete(e, value, p, ctxt);
+    this.getContext().set(AUTO_EQUAL_CONV_SUPPORT, false);
+    this.getContext().set(NUMBER_PROJECT_SUPPORT, true);
   }
 
 
@@ -25,7 +25,7 @@ export class Project extends AbstractOperator {
     if (state && state.abort) {
       return r;
     }
-    const relts = this.value.visit(o);
+    const relts = this.getValue().visit(o);
     return o.leaveOperator(relts, this);
   }
 

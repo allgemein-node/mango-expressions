@@ -2,10 +2,10 @@ import {PAst} from '../ast/PAst';
 import {Match} from './stage/Match';
 import {LessThen} from './compare/LessThen';
 import {MangoExpression} from '../MangoExpression';
-import {And} from './logic/And';
-import {Or} from './logic/Or';
+import {AndDesc} from './logic/AndDesc';
+import {OrDesc} from './logic/OrDesc';
 import {LessThenEqual} from './compare/LessThenEqual';
-import {Equal} from './compare/Equal';
+import {EqualDesc} from './compare/EqualDesc';
 import {GreaterThen} from './compare/GreaterThen';
 import {GreaterThenEqual} from './compare/GreaterThenEqual';
 import {In} from './compare/In';
@@ -32,6 +32,7 @@ import {Context} from '../ast/Context';
 import {Not} from './logic/Not';
 import {Multiply} from './arithmetic/Multiply';
 import {Regex} from './compare/Regex';
+import {AbstractOperator} from './AbstractOperator';
 
 /**
  * Operators registry
@@ -65,7 +66,7 @@ export class Operators {
    * @param p
    * @param ctxt
    */
-  static create(name: string, e: MangoExpression, p?: PAst, ctxt?: Context) {
+  static create(name: string, e: MangoExpression, p?: PAst<any>, ctxt?: Context): AbstractOperator<any> {
     const _name = this.key(name);
     if (this.registry[_name]) {
       return Reflect.construct(this.registry[_name], [e, p, ctxt]);
@@ -87,8 +88,8 @@ export class Operators {
 /*
  *  Logic registry
  */
-Operators.install(And.NAME, And);
-Operators.install(Or.NAME, Or);
+Operators.install(AndDesc.NAME, AndDesc);
+Operators.install(OrDesc.NAME, OrDesc);
 Operators.install(Not.NAME, Not);
 // TODO $nor
 
@@ -131,7 +132,7 @@ Operators.install(LessThen.NAME, LessThen);
 Operators.install(LessThenEqual.NAME, LessThenEqual);
 // backward compatibility
 Operators.install('lte', LessThenEqual);
-Operators.install(Equal.NAME, Equal);
+Operators.install(EqualDesc.NAME, EqualDesc);
 Operators.install(GreaterThen.NAME, GreaterThen);
 Operators.install(GreaterThenEqual.NAME, GreaterThenEqual);
 // backward compatibility

@@ -13,20 +13,20 @@ export interface IMangoWalker {
    *
    * @param ast
    */
-  visitArray(ast: PAst, ctrl?: IMangoWalkerControl): any[];
+  visitArray(ast: PAst<any>, ctrl?: IMangoWalkerControl): any[];
 
-  leaveArray(res: any[], ast: PAst): any;
+  leaveArray(res: any[], ast: PAst<any>): any;
 
-  visitObject(ast: PAst, ctrl?: IMangoWalkerControl): any;
+  visitObject(ast: PAst<any>, ctrl?: IMangoWalkerControl): any;
 
-  leaveObject(res: any, ast: PAst): any;
+  leaveObject(res: any, ast: PAst<any>): any;
 
-  onValue(ast: PAst, ctrl?: IMangoWalkerControl): any;
+  onValue(ast: PAst<any>, ctrl?: IMangoWalkerControl): any;
 
-  onOperator(ast: PAst, valueRes: any, ctrl?: IMangoWalkerControl): any;
+  onOperator(ast: PAst<any>, valueRes: any, ctrl?: IMangoWalkerControl): any;
 
-  visitOperator(ast: PAst, ctrl?: IMangoWalkerControl): any;
+  visitOperator(ast: PAst<any>, ctrl?: IMangoWalkerControl): any;
 
-  leaveOperator(res: any, ast: PAst): any;
+  leaveOperator(res: any, ast: PAst<any>): any;
 
 }

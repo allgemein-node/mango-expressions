@@ -1,6 +1,6 @@
 import {AbstractOperator} from '../AbstractOperator';
 
-export class Year extends AbstractOperator {
+export class Year extends AbstractOperator<any> {
 
   static NAME = 'year';
 

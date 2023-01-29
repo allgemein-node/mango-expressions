@@ -14,13 +14,11 @@ import * as _ from 'lodash';
  *   }
  * }
  */
-export class DateToString extends AbstractOperator {
+export class DateToString extends AbstractOperator<any> {
 
   static NAME = 'dateToString';
 
   name = DateToString.NAME;
-
-  value: PAst;
 
   format: string;
 
@@ -31,8 +29,8 @@ export class DateToString extends AbstractOperator {
 
   validate(def: any, full?: any): boolean {
     if (_.has(def, 'date')) {
-      const ctxt = new Context(this.key);
-      this.value = this.base.interprete(def['date'], this, ctxt);
+      const ctxt = new Context(this.getKeyString());
+      this.value = this.getRootExpression().interprete(def['date'], this, ctxt);
       this.format = _.get(def, 'format', null);
       this.timezone = _.get(def, 'timezone', null);
       this.onNull = _.get(def, 'onNull', null);

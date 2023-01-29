@@ -4,20 +4,22 @@ import {IMangoWalker} from '../IMangoWalker';
 import {NotYetImplementedError} from '@allgemein/base/browser';
 import {Context} from './Context';
 
-export abstract class PValue extends PAst {
+export abstract class PValue extends PAst<any> {
 
-  value: any;
-
-  constructor(e: MangoExpression, value: any, p?: PAst, ctxt?: Context) {
-    super(e, p, ctxt);
+  interprete(e: MangoExpression, value: any, p?: PAst<any>, ctxt?: Context) {
+    this.enviroment(e, p, ctxt);
     this.value = value;
   }
 
-  getKey(key: string): PAst {
+  getByKey(key: string): PAst<any> {
     throw new NotYetImplementedError();
   }
 
   visit(o: IMangoWalker): any {
     return o.onValue(this);
+  }
+
+  toJson(): any {
+    return this.value;
   }
 }
